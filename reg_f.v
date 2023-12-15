@@ -1,6 +1,7 @@
 module reg_f #(
     parameter WIDTH = 8,
-    parameter SIZE = 11
+    parameter SIZE = 11,
+    parameter STACK_SIZE = 5
 )(
     clk,
     rf_addr_r1,
@@ -12,28 +13,8 @@ module reg_f #(
     rf_data_in,
 
     //Stack interface
-    //Push
-    rf_stack_push1,
-    rf_stack_push2,
-    rf_stack_push3,
-    rf_stack_push4,
-    rf_stack_push5,
-    rf_stack_push6,
-    rf_stack_push7,
-    rf_stack_push8,
-    rf_stack_push9,
-
-    //Pop
-    rf_stack_pop_we,
-    rf_stack_pop1,
-    rf_stack_pop2,
-    rf_stack_pop3,
-    rf_stack_pop4,
-    rf_stack_pop5,
-    rf_stack_pop6,
-    rf_stack_pop7,
-    rf_stack_pop8,
-    rf_stack_pop9,
+    rf_stack_push,
+    rf_stack_pop
 );
 
 input clk;
@@ -43,33 +24,17 @@ input [$clog2(SIZE)-1:0] rf_addr_wr;
 input rf_data_we;
 input [WIDTH-1:0] rf_data_in;
 
-//Stack pop
-input rf_stack_pop_we;
-input [WIDHT-1:0] rf_stack_pop1;
-input [WIDHT-1:0] rf_stack_pop2;
-input [WIDHT-1:0] rf_stack_pop3;
-input [WIDHT-1:0] rf_stack_pop4;
-input [WIDHT-1:0] rf_stack_pop5;
-input [WIDHT-1:0] rf_stack_pop6;
-input [WIDHT-1:0] rf_stack_pop7;
-input [WIDHT-1:0] rf_stack_pop8;
-input [WIDHT-1:0] rf_stack_pop9;
+//Stack interface
+input rf_stack_pop;
+input rf_stack_push;
 
 output [WIDTH-1:0] rf_data_out1;
 output [WIDTH-1:0] rf_data_out2;
 
-//Stack push
-output [WIDTH-1:0] rf_stack_push1;
-output [WIDTH-1:0] rf_stack_push2;
-output [WIDTH-1:0] rf_stack_push3;
-output [WIDTH-1:0] rf_stack_push4;
-output [WIDTH-1:0] rf_stack_push5;
-output [WIDTH-1:0] rf_stack_push6;
-output [WIDTH-1:0] rf_stack_push7;
-output [WIDTH-1:0] rf_stack_push8;
-output [WIDTH-1:0] rf_stack_push9;
+//TODO: Use IP core
+reg [WIDTH-1:0] Reg_File [SIZE-1:0];
 
-reg [WIDTH-1:0] REG_FILE [SIZE:0];
+reg [WIDTH-1:0] Reg_Stack [STACK_SIZE-1:0];
 
 initial begin
 	REG_FILE[0] = {WIDTH{1'b0}};
@@ -78,30 +43,37 @@ initial begin
     //REG_FILE[3..10] - R0-R8 work registers
 end
 
-//Stack interface
-//Pop
-always @(posedge rf_stack_pop_we) begin
-    REG_FILE[2] = rf_stack_pop1;
-    REG_FILE[3] = rf_stack_pop2;
-    REG_FILE[4] = rf_stack_pop3;
-    REG_FILE[5] = rf_stack_pop4;
-    REG_FILE[6] = rf_stack_pop5;
-    REG_FILE[7] = rf_stack_pop6;
-    REG_FILE[8] = rf_stack_pop7;
-    REG_FILE[9] = rf_stack_pop8;
-    REG_FILE[10] = rf_stack_pop9;
+always @(posedge clk) begin
+    if(rf_data_we) begin
+        Reg_File[rf_addr_wr] = rf_data_in;
+    end
 end
 
+assign rf_data_out1 = Reg_File[rf_addr_r1];
+assign rf_data_out2 = Reg_File[rf_addr_r2];
 
-//Push
-assign rf_stack_push1 = REG_FILE[2];
-assign rf_stack_push2 = REG_FILE[3];
-assign rf_stack_push3 = REG_FILE[4];
-assign rf_stack_push4 = REG_FILE[5];
-assign rf_stack_push5 = REG_FILE[6];
-assign rf_stack_push6 = REG_FILE[7];
-assign rf_stack_push7 = REG_FILE[8];
-assign rf_stack_push8 = REG_FILE[9];
-assign rf_stack_push9 = REG_FILE[10];
+always @(posedge rf_stack_push) begin
+    Reg_Stack[0] = Reg_File[2];
+    Reg_Stack[1] = Reg_File[3];
+    Reg_Stack[2] = Reg_File[4];
+    Reg_Stack[3] = Reg_File[5];
+    Reg_Stack[4] = Reg_File[6];
+    Reg_Stack[5] = Reg_File[7];
+    Reg_Stack[6] = Reg_File[8];
+    Reg_Stack[7] = Reg_File[9];
+    Reg_Stack[8] = Reg_File[10];
+end
+
+always @(posedge rf_stack_pop) begin
+    Reg_File[2] = Reg_Stack[0];
+    Reg_File[3] = Reg_Stack[1];
+    Reg_File[4] = Reg_Stack[2];
+    Reg_File[5] = Reg_Stack[3];
+    Reg_File[6] = Reg_Stack[4];
+    Reg_File[7] = Reg_Stack[5];
+    Reg_File[8] = Reg_Stack[6];
+    Reg_File[9] = Reg_Stack[7];
+    Reg_File[10] = Reg_Stack[8];
+end
 
 endmodule 
