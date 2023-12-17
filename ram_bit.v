@@ -1,45 +1,45 @@
 module ram_bit #(
-    parameter AWIDTH = 2
+    parameter AWIDTH = 8
 ) (
-    CLK,
-    PORT_A_ADDRESS,
-    PORT_A_OUT,
+    clk,
+    port_a_address,
+    port_a_out,
 
-    PORT_B_ADDRESS,
-    PORT_B_OUT,
+    port_b_address,
+    port_b_out,
 
-    PORT_C_ADDRESS,
-    PORT_C_DATA,
-    PORT_C_WE
+    port_c_address,
+    port_c_data,
+    port_c_we
 );
 
-input CLK;
-input [AWIDTH-1:0] PORT_A_ADDRESS;
-output PORT_A_OUT;
+input clk;
+input [AWIDTH-1:0] port_a_address;
+output port_a_out;
 
-input [AWIDTH-1:0] PORT_B_ADDRESS;
-output PORT_B_OUT;
+input [AWIDTH-1:0] port_b_address;
+output port_b_out;
 
-input [AWIDTH-1:0] PORT_C_ADDRESS;
-input PORT_C_DATA;
-input PORT_C_WE;
+input [AWIDTH-1:0] port_c_address;
+input port_c_data;
+input port_c_we;
 
 ram_mlab_bit MEM1 (
-	.clock(!CLK),
-	.rdaddress({6'b00,PORT_A_ADDRESS}),
-	.wraddress({6'b00,PORT_C_ADDRESS}),
-	.data(PORT_C_DATA),
-	.wren(!PORT_C_WE),
-	.q(PORT_A_OUT)
+	.clock(clk),
+	.rdaddress({6'b00,port_a_address}),
+	.wraddress({6'b00,port_c_address}),
+	.data(port_c_data),
+	.wren(port_c_we),
+	.q(port_a_out)
 );
 
 ram_mlab_bit MEM2 (
-	.clock(!CLK),
-	.rdaddress({6'b00,PORT_B_ADDRESS}),
-	.wraddress({6'b00,PORT_C_ADDRESS}),
-	.data(PORT_C_DATA),
-	.wren(!PORT_C_WE),
-	.q(PORT_B_OUT)
+	.clock(clk),
+	.rdaddress({6'b00,port_b_address}),
+	.wraddress({6'b00,port_c_address}),
+	.data(port_c_data),
+	.wren(port_c_we),
+	.q(port_b_out)
 );
 
 endmodule

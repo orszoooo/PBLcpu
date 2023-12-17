@@ -1,108 +1,79 @@
 module alu #(
-    parameter DWIDTH = 8
+    parameter WIDTH = 8,
+    parameter IWIDTH = 8,
+    parameter SOURCES = 4
 )(
-    IN_INSTR,
-    IN_A,
-    IN_B,
-    Cin,
-    Cout,
-    Bin,
-    Bout,
-    OUT
+    op_code,
+
+    source1_choice,
+    bit_mem_a,
+    word_mem_a,
+    rf_a,
+    imm_a,
+
+    source2_choice,
+    bit_mem_b,
+    word_mem_b,
+    rf_b,
+    imm_b,
+
+    alu_c_in,
+    alu_b_in,
+    alu_c_out,
+    alu_b_out,
+    alu_out
 );
 
-parameter IWIDTH = 4;
-input [IWIDTH-1:0] IN_INSTR;
-input [DWIDTH-1:0] IN_A;
-input [DWIDTH-1:0] IN_B;
-input Cin,Bin;
-output Cout, Bout;
-output reg [DWIDTH-1:0] OUT;
+input [IWIDTH-1:0] op_code; 
 
-reg [DWIDTH-1:0] IN_ADD_SUB;
-reg EN_ADD_nSUB;
-wire [DWIDTH-1:0] OUT_ADD;
-wire [DWIDTH-1:0] OUT_SUB;
-wire [DWIDTH-1:0] OUT_ADD_SUB;
+input [$clog2(SOURCES)-1:0] source1_choice
+input bit_mem_a;
+input [WIDTH-1:0] word_mem_a;
+input [WIDTH-1:0] rf_a;
+input [WIDTH-1:0] imm_a;
+wire in_a;
 
-alu_add #(
-    .WIDTH(DWIDTH)
-)
-adder (
-    .EN(EN_ADD_nSUB),
-    .IN_A(IN_A),
-    .IN_B(IN_ADD_SUB),
-    .IN_C(Cin), 
-    .OUT(OUT_ADD),
-    .C_OUT(Cout)
-);
+input [$clog2(SOURCES)-1:0] source2_choice
+input bit_mem_b;
+input [WIDTH-1:0] word_mem_b;
+input [WIDTH-1:0] rf_b;
+wire in_b;
 
-alu_sub #(
-    .WIDTH(DWIDTH)
-)
-subtactor (
-    .EN(!EN_ADD_nSUB),
-    .IN_A(IN_A),
-    .IN_B(IN_ADD_SUB),
-    .IN_Bin(Bin), 
-    .OUT(OUT_SUB),
-    .B_OUT(Bout)
-);
+input alu_c_in;
+input alu_b_in;
 
-assign OUT_ADD_SUB = (EN_ADD_nSUB ? OUT_ADD : OUT_SUB);
+output [WIDTH-1:0] alu_out;
+
+assign in_a = (source1_choice[1] ? : (source1_choice[0] ? imm_a : rf_a) (source1_choice[0] ? word_mem_a : bit_mem_a));
+assign in_b = (source1_choice[1] ? : (source1_choice[0] ? imm_b : rf_b) (source1_choice[0] ? word_mem_b : bit_mem_b));
 
 always @(*) begin
-    EN_ADD_nSUB = 1'b1; //uses ADDER
-    IN_ADD_SUB = IN_B;
 
-    case(IN_INSTR)
-        4'h0: begin  //NOT
-            OUT = ~IN_A;
-        end
-        
-        4'h1: begin //XOR
-            OUT = IN_A ^ IN_B;
-        end
-        
-        4'h2: begin //OR
-            OUT = IN_A | IN_B;
-        end
-        4'h3: begin //AND
-            OUT = IN_A & IN_B;
-        end
-        
-        4'h4: begin //SUB 
-            EN_ADD_nSUB = 1'b0;
-            OUT = OUT_ADD_SUB;
-        end
-        
-        4'h5: begin //ADD
-            OUT = OUT_ADD_SUB;
-        end
-        
-        4'h6: begin //RR
-            OUT = {1'b0,IN_A[DWIDTH-1:1]};
-        end
-        
-        4'h7: begin //RL
-            OUT = {IN_A[DWIDTH-2:0],1'b0};
-        end
-        
-        4'h8: begin // DEC
-            EN_ADD_nSUB = 1'b0;
-            if(!Bin) IN_ADD_SUB = {{DWIDTH-1{1'b0}},1'b1}; 
-            else IN_ADD_SUB = {DWIDTH{1'b0}}; 
-            OUT = OUT_ADD_SUB;
-        end
-
-        4'h9: begin //INC
-            if(!Cin) IN_ADD_SUB = {{DWIDTH-1{1'b0}},1'b1}; 
-            else IN_ADD_SUB = {DWIDTH{1'b0}}; 
-            OUT = OUT_ADD_SUB;
-        end
-        default: begin //LD, ST, NOP, RST
-            OUT = IN_B;
-        end
+    case(op_code)
+        8'h00: alu_out = in_a & in_b; //AND
+        8'h01: alu_out = ~(in_a & in_b);//ANDN
+        8'h02: alu_out = in_a | in_b; //OR
+        8'h03: alu_out = ~(in_a | in_b); //ORN
+        8'h04: alu_out = in_a ^ in_b; //XOR
+        8'h05: alu_out = ~(in_a ^ in_b); //XORN
+        8'h06: alu_out = ~in_a; //NOT
+        8'h07: {alu_c_out, alu_out} = in_a + in_b + alu_c_in; //ADD
+        8'h08: {alu_b_out, alu_out} = in_a - in_b - alu_b_in; //SUB
+        8'h09: alu_out = in_a * in_b; //MUL
+        8'h0A: alu_out = in_a / in_b; //DIV
+        8'h0B: alu_out = in_a % in_b; //MOD
+        8'h0C: alu_out = (in_a > in_b) ? in_a : in_b; //GT
+        8'h0D: alu_out = (in_a >= in_b) ? in_a : in_b; //GE
+        8'h0E: alu_out = (in_a == in_b);  //EQ
+        8'h0F: alu_out = ~(in_a == in_b); //NE
+        8'h10: alu_out = (in_a <= in_b) ? in_a : in_b; //LE
+        8'h11: alu_out = (in_a < in_b) ? in_a : in_b; //LT
+        8'h1B: alu_out = {WIDTH{1'b1}}; //S
+        8'h1C: alu_out = {WIDTH{1'b0}}; //R
+        8'h1D: alu_out = in_a; //ST
+        8'h1E: alu_out = ~in_a; //STN
+        8'h1F: alu_out = in_a; //LD
+        default: 
     endcase
 end
 

@@ -14,7 +14,8 @@ module reg_f #(
 
     //Stack interface
     rf_stack_push,
-    rf_stack_pop
+    rf_stack_pop,
+    rf_acc_zero
 );
 
 input clk;
@@ -30,6 +31,7 @@ input rf_stack_push;
 
 output [WIDTH-1:0] rf_data_out1;
 output [WIDTH-1:0] rf_data_out2;
+output rf_acc_zero;//!!
 
 //TODO: Use IP core
 reg [WIDTH-1:0] Reg_File [SIZE-1:0];
