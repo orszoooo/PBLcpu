@@ -8,7 +8,7 @@ module flag_reg (
     flag_b_in,
     flag_c_out,
     flag_z_out,
-    flab_b_out
+    flag_b_out
 );
 
 input clk, flag_rst, flag_c_in, flag_z_in, flag_b_in;
@@ -23,48 +23,48 @@ reg C_LAST = 1'b0;
 reg B_LAST = 1'b0;
 
 //Reset
-always @(RST) begin
-    C <= 1'b0;
-    Z <= 1'b0;
-    B <= 1'b0;
+always @(flag_rst) begin
+    flag_c_out <= 1'b0;
+    flag_z_out <= 1'b0;
+    flag_b_out <= 1'b0;
 end
 
 //Zero
-always @(Zin) begin
-    Z <= Zin;
+always @(flag_z_in) begin
+    flag_z_out <= flag_z_in;
 end
 
 //Set C
-always @(Cin) begin
-    if(Cin || C_LAST) begin
-        C = 1'b1; 
+always @(flag_c_in) begin
+    if(flag_c_in || C_LAST) begin
+        flag_c_out = 1'b1; 
     end
     else begin
-        C = 1'b0;
+        flag_c_out = 1'b0;
     end
 end
 
 //Set B
-always @(Bin) begin
-    if(Bin || B_LAST) begin
-        B = 1'b1; 
+always @(flag_b_in) begin
+    if(flag_b_in || B_LAST) begin
+        flag_b_out = 1'b1; 
     end
     else begin
-        B = 1'b0;
+        flag_b_out = 1'b0;
     end
 end
 
 //Reset C/B
-always @(posedge CLK) begin
-    if(!Cin && C_LAST) begin
-        C <= 1'b0; 
+always @(posedge clk) begin
+    if(!flag_c_in && C_LAST) begin
+        flag_c_out <= 1'b0; 
     end
-    C_LAST <= Cin;
+    C_LAST <= flag_c_in;
 
-    if(!Bin && B_LAST) begin
-        B <= 1'b0; 
+    if(!flag_b_in && B_LAST) begin
+        flag_b_out <= 1'b0; 
     end
-    B_LAST <= Bin;
+    B_LAST <= flag_b_in;
 end
 
 endmodule

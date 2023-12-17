@@ -221,3 +221,5 @@ output_files/PBLcpu.sta.summary
 output_files/greybox_tmp/cbx_args.txt
 simulation/questa/PBLcpu.sft
 simulation/questa/PBLcpu.vo
+tb/flag_reg/flag_reg_sim
+tb/flag_reg/flag_reg_sim.vcd
