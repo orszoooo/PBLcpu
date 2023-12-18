@@ -1,6 +1,6 @@
 `timescale 1ns/100ps
 
-module ram_bit_tb;
+module ram_word_tb;
 parameter AWIDTH = 8;
 parameter WIDTH = 8;
 
@@ -13,7 +13,7 @@ reg                    WE;
 wire    [WIDTH-1:0]    A_OUT;
 wire    [WIDTH-1:0]    B_OUT;
 
-ram_bit # (
+ram_word # (
     .AWIDTH(AWIDTH),
     .WIDTH(WIDTH)) 
 UUT(
@@ -90,6 +90,7 @@ initial begin
         WAIT(1);
     end
 
+    WAIT(10);
     //Both ports read - different cells
     //Simultanues write to same cell as port A
     ADDRESS_A = 8'h01;
@@ -120,7 +121,7 @@ end
 
 // Writing VCD waveform
 initial begin
-	$dumpfile("ram_bit_sim.vcd");
+	$dumpfile("ram_word_sim.vcd");
 	$dumpvars(0, UUT);
 	$dumpon;
 end
