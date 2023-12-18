@@ -62,17 +62,18 @@ always @(*) begin
         8'h09: alu_out = in_a * in_b; //MUL
         8'h0A: alu_out = in_a / in_b; //DIV
         8'h0B: alu_out = in_a % in_b; //MOD
-        8'h0C: alu_out = (in_a > in_b) ? in_a : in_b; //GT
-        8'h0D: alu_out = (in_a >= in_b) ? in_a : in_b; //GE
+        8'h0C: alu_out = (in_a > in_b) ? 8'hFF : 8'h00; //GT
+        8'h0D: alu_out = (in_a >= in_b) ? 8'hFF : 8'h00; //GE
         8'h0E: alu_out = (in_a == in_b);  //EQ
         8'h0F: alu_out = ~(in_a == in_b); //NE
-        8'h10: alu_out = (in_a <= in_b) ? in_a : in_b; //LE
-        8'h11: alu_out = (in_a < in_b) ? in_a : in_b; //LT
+        8'h10: alu_out = (in_a <= in_b) ? 8'hFF : 8'h00; //LE
+        8'h11: alu_out = (in_a < in_b) ? 8'hFF : 8'h00; //LT
         8'h1B: alu_out = {WIDTH{1'b1}}; //S
         8'h1C: alu_out = {WIDTH{1'b0}}; //R
         8'h1D: alu_out = in_a; //ST
         8'h1E: alu_out = ~in_a; //STN
         8'h1F: alu_out = in_a; //LD
+        8'h20: alu_out = ~in_a; //LDN
         default: 
     endcase
 end
