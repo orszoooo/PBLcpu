@@ -1,10 +1,9 @@
 #!/bin/bash
 cd Output
 
-rm -f flag_reg_sim
 rm -f flag_reg_sim.vcd
 
-iverilog -Wall -s flag_reg_tb -o flag_reg_sim ../../Modules/flag_reg_tb.v ../../Modules/flag_reg.v
+iverilog -Wall -s flag_reg_tb -o flag_reg_sim ../../Modules/tb/flag_reg_tb.v ../../Modules/flag_reg.v
 
 if [ $? -eq 1 ]; then
     echo Source compilation failure
@@ -25,3 +24,5 @@ fi
 #    echo GTKWave failure
 #    exit 1
 #fi
+
+rm -f flag_reg_sim
