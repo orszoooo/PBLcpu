@@ -31,13 +31,13 @@ integer i = 0;
 
 initial begin
     $display("Simulation of %m started.");
-    ADDRESS_A = 5'h00;
-    ADDRESS_B = 5'h00;
-    ADDRESS_C = 5'h00;
+    ADDRESS_A = 8'h00;
+    ADDRESS_B = 8'h00;
+    ADDRESS_C = 8'h00;
     DATA = 1'b0;
     WE = 1'b1;
     
-    //Initialize the stack with 8'h00
+    //Initialize the RAM
     for(i = 0; i < 2**AWIDTH; i++) begin
         WE = 1'b1;
         ADDRESS_C  = ADDRESS_C  + 8'h01;
@@ -67,7 +67,7 @@ initial begin
     
     WAIT(10);
     //Both ports read - different cells
-    ADDRESS_A = 5'h01;
+    ADDRESS_A = 8'h01;
 
     for(i = 0; i < (2**AWIDTH-1); i++) begin
         ADDRESS_A  = ADDRESS_A + 8'h01;
@@ -78,8 +78,8 @@ initial begin
     WAIT(10);
 
     //Both ports read - same cells
-    ADDRESS_A = 5'h00;
-    ADDRESS_B = 5'h00;
+    ADDRESS_A = 8'h00;
+    ADDRESS_B = 8'h00;
     WAIT(1);
 
     for(i = 0; i < 2**AWIDTH; i++) begin
@@ -90,8 +90,8 @@ initial begin
 
     //Both ports read - different cells
     //Simultanues write to same cell as port A
-    ADDRESS_A = 5'h01;
-    ADDRESS_C = 5'h01;
+    ADDRESS_A = 8'h01;
+    ADDRESS_C = 8'h01;
 
     for(i = 0; i < (2**AWIDTH-1); i++) begin
         WE = 1'b1;
