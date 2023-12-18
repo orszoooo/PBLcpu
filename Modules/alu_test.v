@@ -1,6 +1,6 @@
 module alu_test #(
     parameter WIDTH = 3,
-	 parameter AWIDTH = 2
+	parameter AWIDTH = 2
 )
 (
     CLK,

@@ -1,9 +1,10 @@
 #!/bin/bash
+cd Output
 
-rm -f cpu_sim
-rm -f cpu_sim.vcd
+rm -f flag_reg_sim
+rm -f flag_reg_sim.vcd
 
-iverilog -Wall -s flag_reg_tb -o flag_reg_sim flag_reg_tb.v ../../flag_reg.v
+iverilog -Wall -s flag_reg_tb -o flag_reg_sim ../../Modules/flag_reg_tb.v ../../Modules/flag_reg.v
 
 if [ $? -eq 1 ]; then
     echo Source compilation failure

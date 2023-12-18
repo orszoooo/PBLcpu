@@ -15,9 +15,9 @@ flag_reg UUT(
     .flag_c_in(Cin),
     .flag_z_in(Zin),
     .flag_b_in(Bin),
-    .flag_c_out(C),
-    .flag_z_out(Z),
-    .flag_b_out(B)
+    .flag_c(C),
+    .flag_z(Z),
+    .flag_b(B)
 );
 
 initial begin
