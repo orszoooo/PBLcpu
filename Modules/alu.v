@@ -1,3 +1,5 @@
+`timescale 1ns/100ps
+
 module alu #(
     parameter WIDTH = 8,
     parameter IWIDTH = 8,
@@ -26,29 +28,36 @@ module alu #(
 
 input [IWIDTH-1:0] op_code; 
 
-input [$clog2(SOURCES)-1:0] source1_choice
+input [$clog2(SOURCES)-1:0] source1_choice;
 input bit_mem_a;
 input [WIDTH-1:0] word_mem_a;
 input [WIDTH-1:0] rf_a;
 input [WIDTH-1:0] imm_a;
-wire in_a;
+wire [WIDTH-1:0] in_a;
 
-input [$clog2(SOURCES)-1:0] source2_choice
+input [$clog2(SOURCES)-1:0] source2_choice;
 input bit_mem_b;
 input [WIDTH-1:0] word_mem_b;
 input [WIDTH-1:0] rf_b;
-wire in_b;
+input [WIDTH-1:0] imm_b;
+wire [WIDTH-1:0] in_b;
 
 input alu_c_in;
 input alu_b_in;
 
-output [WIDTH-1:0] alu_out;
+output reg [WIDTH-1:0] alu_out;
+output reg alu_c_out;
+output reg alu_b_out;
 
-assign in_a = (source1_choice[1] ? : (source1_choice[0] ? imm_a : rf_a) (source1_choice[0] ? word_mem_a : bit_mem_a));
-assign in_b = (source1_choice[1] ? : (source1_choice[0] ? imm_b : rf_b) (source1_choice[0] ? word_mem_b : bit_mem_b));
+assign in_a = (source1_choice[1] ? (source1_choice[0] ? imm_a : word_mem_a) : (source1_choice[0] ? bit_mem_a : rf_a));
+assign in_b = (source2_choice[1] ? (source2_choice[0] ? imm_b : word_mem_b) : (source2_choice[0] ? bit_mem_b : rf_b));
+
+initial begin
+    alu_c_out = 1'b0;
+    alu_b_out = 1'b0;
+end
 
 always @(*) begin
-
     case(op_code)
         8'h00: alu_out = in_a & in_b; //AND
         8'h01: alu_out = ~(in_a & in_b);//ANDN
@@ -74,7 +83,7 @@ always @(*) begin
         8'h1E: alu_out = ~in_a; //STN
         8'h1F: alu_out = in_a; //LD
         8'h20: alu_out = ~in_a; //LDN
-        default: 
+        default: alu_out = in_a;
     endcase
 end
 
