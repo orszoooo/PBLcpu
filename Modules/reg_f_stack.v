@@ -1,3 +1,5 @@
+`timescale 1ns/100ps
+
 module reg_f_stack #(
     parameter WIDTH = 8
 )(
@@ -25,7 +27,7 @@ module reg_f_stack #(
 );
 
 input clk;
-input [4:0] addr;
+input [5:0] addr;
 input wren;
 
 input [WIDTH-1:0] reg1_data;

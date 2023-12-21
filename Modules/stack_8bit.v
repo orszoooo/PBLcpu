@@ -12,7 +12,7 @@ module stack_8bit #(
 	q
 );
 
-input	[$clog2(SIZE)-1:0]  address;
+input	[$clog2(SIZE+1)-1:0]  address; //address 6'h00 == empty stack
 input						clock;
 input	[WIDTH-1:0]  		data;
 input	  					wren;
@@ -20,10 +20,19 @@ output	[WIDTH-1:0]  		q;
 
 reg 	[WIDTH-1:0] 		STACK 	[SIZE-1:0]; 
 
-always @(posedge clock) begin
-	if(wren) STACK[address] <= data;
+integer i;
+
+initial begin
+	for(i=0; i<SIZE;i++) begin
+		STACK[i] = 8'h00;
+	end
 end
 
-assign q = STACK[address];
+always @(posedge clock) begin
+	if(wren & address > 6'h00) 
+		STACK[address] <= data;
+end
+
+assign q = ((address > 6'h00) ? STACK[address] : 8'h00);
 
 endmodule

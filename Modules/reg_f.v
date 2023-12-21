@@ -1,3 +1,5 @@
+`timescale 1ns/100ps
+
 module reg_f #(
     parameter WIDTH = 8,
     parameter SIZE = 11
@@ -28,7 +30,7 @@ input [WIDTH-1:0] rf_data_in;
 //Stack interface
 input rf_stack_pop;
 input rf_stack_push;
-input [4:0] rf_stack_pointer;
+input [5:0] rf_stack_pointer;
 
 output [WIDTH-1:0] rf_data_out1;
 output [WIDTH-1:0] rf_data_out2;
@@ -70,20 +72,37 @@ reg_f_stack stack(
     .stack9_out(st9_reg_out)
 );
 
+integer i;
 
 initial begin
 	REG_FILE[0] = {WIDTH{1'b0}};
 	REG_FILE[1] = {WIDTH{1'b1}}; 
 	//REG_FILE[2] - ACC
     //REG_FILE[3..10] - R0-R8 work registers
+
+    for(i=2; i<SIZE;i++) begin
+		REG_FILE[i] = 8'h00;
+	end
 end
 
 always @(posedge clk) begin
     if(rf_data_we) begin
-        REG_FILE[rf_addr_wr] = rf_data_in;
+        if(rf_addr_wr > 1) 
+            REG_FILE[rf_addr_wr] = rf_data_in;
     end
-	 
-	 if(rf_stack_pop) begin
+    if(rf_stack_push) begin
+        //Clear the registers
+		REG_FILE[2] <= REG_FILE[0];
+		REG_FILE[3] <= REG_FILE[0];
+		REG_FILE[4] <= REG_FILE[0];
+		REG_FILE[5] <= REG_FILE[0];
+		REG_FILE[6] <= REG_FILE[0];
+		REG_FILE[7] <= REG_FILE[0];
+		REG_FILE[8] <= REG_FILE[0];
+		REG_FILE[9] <= REG_FILE[0];
+		REG_FILE[10] <= REG_FILE[0];
+	 end
+	if(rf_stack_pop & rf_stack_pointer > 6'h00) begin
 		REG_FILE[2] <= st1_reg_out;
 		REG_FILE[3] <= st2_reg_out;
 		REG_FILE[4] <= st3_reg_out;
