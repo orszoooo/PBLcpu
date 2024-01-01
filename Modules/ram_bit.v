@@ -31,7 +31,8 @@ reg MEM [(2**AWIDTH)-1:0];
 
 always @(posedge clk) begin
 	 if(port_c_we) begin
-		  MEM[port_c_address] <= port_c_data;
+	     MEM[port_c_address] <= port_c_data;
+	     $display (port_c_address, "        ",port_c_data);
 	 end
 end
 

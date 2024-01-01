@@ -83,6 +83,7 @@ always @(*) begin
         8'h1E: alu_out = ~in_a; //STN
         8'h1F: alu_out = in_a; //LD
         8'h20: alu_out = ~in_a; //LDN
+        8'h21: alu_out = (bit_mem_a == 1'b1) ? in_b : 8'h00;
         default: alu_out = in_a;
     endcase
 end

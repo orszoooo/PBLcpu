@@ -25,15 +25,16 @@ input [AWIDTH-1:0] port_b_address;
 output [WIDTH-1:0] port_b_out;
 
 input [AWIDTH-1:0] port_c_address;
-input [WIDTH-1:0] port_c_data;
+input [WIDTH-1:0]  port_c_data;
 input port_c_we;
 
 reg [WIDTH-1:0] MEM [(2**AWIDTH)-1:0];
 
 always @(posedge clk) begin
-	 if(port_c_we) begin
-		  MEM[port_c_address] <= port_c_data;
-	 end
+    if(port_c_we) begin
+	MEM[port_c_address] <= port_c_data;
+	$display (port_c_address, "        ",port_c_data);
+       	end
 end
 
 assign port_a_out = MEM[port_a_address];
